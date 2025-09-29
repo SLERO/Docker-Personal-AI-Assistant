@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # База данных в отдельном контейнере
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/chroma/chroma
+    
+  # Твой AI-ассистент (теперь подключается к базе по сети)
+  ai-assistant:
+    build: .
+    ports:
+      - "7861:7861"
+    volumes:
+      - ./models:/app/models
+    depends_on:
+      - chromadb  # Ждёт, пока база запустится
+    environment:
+      - CHROMA_HOST=chromadb  # Адрес базы
